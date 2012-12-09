@@ -8,7 +8,7 @@ PMs.prototype.pm = function(pid) {
     }
     if (players.isIgnored(pid))
         return;
-    this.pms[pid] = new PM(pid);
+    new PM(pid);
     return this.pms[pid];
 }
 
@@ -40,7 +40,7 @@ function PM(pid) {
                                       +'<p><input type="text" id="send-pm-'+pid+'" cols="40" onkeydown="if(event.keyCode==13)sendMessage(this);" placeholder="Type your message here..."/>'
                                       +' <button onClick="sendMessage(document.getElementById(\'send-pm-'+pid+'\'));">Send</button>'
                                       +' <button onClick="pms.pm(' + pid + ').close();">Close</button></p>');
-        pms.pm[pid] = this;
+        pms.pms[pid] = this;
         $('#channel-tabs').tabs("select", "#pm-"+pid);
     }
 }
@@ -97,4 +97,5 @@ PM.prototype.print = function(pid, msg) {
 
 PM.prototype.close = function() {
     $('#channel-tabs').tabs("remove", "#pm-" + this.id);
+    delete pms.pms[this.id];
 }
