@@ -128,7 +128,7 @@ function Pokemon(species) {
 		if (selfP.hasVolatile(volatile)) return;
 		selfP.volatiles[volatile] = [volatile, null];
 		if (volatile === 'leechseed') {
-			selfP.side.battle.spriteElemsFront[selfP.side.n].append('<img src="/fx/energyball.png" style="display:none;position:absolute" />');
+			selfP.side.battle.spriteElemsFront[selfP.side.n].append('<img src="libs/ps/fx/energyball.png" style="display:none;position:absolute" />');
 			var curelem = selfP.side.battle.spriteElemsFront[selfP.side.n].children().last();
 			curelem.css(self.pos({
 				display: 'block',
@@ -140,7 +140,7 @@ function Pokemon(species) {
 			}, BattleEffects.energyball));
 			var elem = curelem;
 
-			selfP.side.battle.spriteElemsFront[selfP.side.n].append('<img src="/fx/energyball.png" style="display:none;position:absolute" />');
+			selfP.side.battle.spriteElemsFront[selfP.side.n].append('<img src="libs/ps/fx/energyball.png" style="display:none;position:absolute" />');
 			curelem = selfP.side.battle.spriteElemsFront[selfP.side.n].children().last();
 			curelem.css(self.pos({
 				display: 'block',
@@ -152,7 +152,7 @@ function Pokemon(species) {
 			}, BattleEffects.energyball));
 			elem = elem.add(curelem);
  
-			selfP.side.battle.spriteElemsFront[selfP.side.n].append('<img src="/fx/energyball.png" style="display:none;position:absolute" />');
+			selfP.side.battle.spriteElemsFront[selfP.side.n].append('<img src="libs/ps/fx/energyball.png" style="display:none;position:absolute" />');
 			curelem = selfP.side.battle.spriteElemsFront[selfP.side.n].children().last();
 			curelem.css(self.pos({
 				display: 'block',
@@ -510,7 +510,7 @@ function Battle(frame, logFrame, noPreload) {
 		self.logPreemptElem = logFrame.children().last();
 		logFrame.append('<div class="inner-after"></div>');
 
-		self.elem.append('<div class="backdrop" style="background-image:url(/fx/' + self.backdropImage + ');display:block;opacity:0"></div>');
+		self.elem.append('<div class="backdrop" style="background-image:url(libs/ps/fx/' + self.backdropImage + ');display:block;opacity:0"></div>');
 		self.bgElem = self.elem.children().last();
 		self.bgElem.animate({
 			opacity: 0.6
@@ -1262,12 +1262,12 @@ function Battle(frame, logFrame, noPreload) {
 				if (i >= selfS.totalPokemon) {
 					pokemonhtml += '<span class="pokemonicon" style="'+Tools.getIcon('pokeball-none')+'"></span>';
 				} else if (!poke) {
-					//pokemonhtml += '<img src="/fx/pokeball.png" title="Not revealed" />';
+					//pokemonhtml += '<img src="libs/ps/fx/pokeball.png" title="Not revealed" />';
 					pokemonhtml += '<span class="pokemonicon" style="'+Tools.getIcon('pokeball')+'" title="Not revealed"></span>';
 				//} else if (poke.fainted) {
-					//pokemonhtml += '<img src="/fx/pokeball.png" style="opacity:0.3;filter:alpha(opacity=30)" title="' + poke.getFullName(true) + '" />';
+					//pokemonhtml += '<img src="libs/ps/fx/pokeball.png" style="opacity:0.3;filter:alpha(opacity=30)" title="' + poke.getFullName(true) + '" />';
 				} else {
-					//pokemonhtml += '<img src="/fx/pokeball.png" title="' + poke.getFullName(true) + '" />';
+					//pokemonhtml += '<img src="libs/ps/fx/pokeball.png" title="' + poke.getFullName(true) + '" />';
 					pokemonhtml += '<span class="pokemonicon" style="'+Tools.getIcon(poke)+'" title="' + poke.getFullName(true) + '"></span>';
 				}
 				if (i % 3 === 2) pokemonhtml += '</div><div class="teamicons">';
@@ -3817,23 +3817,19 @@ function Battle(frame, logFrame, noPreload) {
 		if (name.substr(0, 4) === 'p2: ' || name === 'p2') {
 			siden = self.p2.n;
 			name = name.substr(4);
-			species = name;
 		} else if (name.substr(0, 4) === 'p1: ' || name === 'p1') {
 			siden = self.p1.n;
 			name = name.substr(4);
-			species = name;
 		} else if (name.substr(0, 2) === 'p2' && name.substr(3, 2) === ': ') {
 			slot = slotChart[name.substr(2,1)];
 			siden = self.p2.n;
 			name = name.substr(5);
 			pokemonid = 'p2: '+name;
-			species = name;
 		} else if (name.substr(0, 2) === 'p1' && name.substr(3, 2) === ': ') {
 			slot = slotChart[name.substr(2,1)];
 			siden = self.p1.n;
 			name = name.substr(5);
 			pokemonid = 'p1: '+name;
-			species = name;
 		}
 
 		if (!slot) slot = 0;
@@ -4008,6 +4004,7 @@ function Battle(frame, logFrame, noPreload) {
 		}
 	};
 	this.runMajor = function(args, kwargs, preempt) {
+        console.log("arguments: " + JSON.stringify(args));
 		switch (args[0]) {
 		case 'start':
 			self.teamPreview(false);
@@ -4481,15 +4478,17 @@ function Battle(frame, logFrame, noPreload) {
 		for (i in BattleEffects) {
 			if (BattleEffects[i].url) self.preloadImage(BattleEffects[i].url);
 		}
-		self.preloadImage('/fx/weather-raindance.jpg'); // rain is used often enough to precache
+		self.preloadImage('libs/ps/fx/weather-raindance.jpg'); // rain is used often enough to precache
 		self.preloadImage('/sprites/bw/substitute.png');
 		self.preloadImage('/sprites/bw-back/substitute.png');
-		//self.preloadImage('/fx/bg.jpg');
+		//self.preloadImage('libs/ps/fx/bg.jpg');
 	};
 	this.preloadSounds = function () {
 		//self.preloadAudio('audio/bw-trainer-battle.mp3');
 	}
 	this.preloadAudio = function (url, autoplay) {
+        return; /**** PO Edit: no sounds ****/
+
 		if (noPreload) return;
 		var token = url.replace(/\.(wav|mp3)$/, '').replace(/\//g, '-');
 		if (self.preloadCache[token]) {
@@ -4627,6 +4626,8 @@ function Battle(frame, logFrame, noPreload) {
 	// 1 = playing
 	// 2 = paused
 	this.soundStart = function () {
+        return; /**** PO Edit: no sounds ****/
+
 		if (self.mute) return;
 		if (self.soundState === 0) {
 			self.soundState = 1;
@@ -4639,10 +4640,14 @@ function Battle(frame, logFrame, noPreload) {
 		}
 	};
 	this.soundStop = function () {
+        return; /**** PO Edit: no sounds ****/
+
 		soundManager.stopAll();
 		self.soundState = 0;
 	};
 	this.soundPause = function () {
+        return; /**** PO Edit: no sounds ****/
+
 		if (self.soundState === 1) {
 			if (self.bgm) self.bgm.pause();
 			self.soundState = 2;

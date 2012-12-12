@@ -195,7 +195,18 @@ var POStatNames = { // PO style
 	def: 'Def',
 	spa: 'SAtk',
 	spd: 'SDef',
-	spe: 'Spd'
+	spe: 'Spd',
+    /* improper style go */
+    nums: {
+        0: "hp",
+        1: "atk",
+        2: "def",
+        3: "spa",
+        4: "spd",
+        5: "spe",
+        6: "accuracy",
+        7: "evasion"
+    }
 };
 var StatNames = { // proper style
 	hp: 'HP',
@@ -394,8 +405,10 @@ var Tools = {
 	
 	getSpriteData: function(pokemon, siden) {
 		pokemon = Tools.getTemplate(pokemon);
+        var padd = function(num) {return ("00"+num).slice(-3);};
 		var isBack = !siden;
-		var back = (siden?'':'-back');
+		var back = (siden?'':'back/');
+        var shiny = pokemon.shiny ? "shiny/" : "";
 		var facing = (siden?'front':'back');
 		var cryurl = '';
 		var spriteid = pokemon.spriteid;
@@ -405,16 +418,13 @@ var Tools = {
 			if (num.length < 3) num = '0' + num;
 			cryurl = '/audio/cries/' + num + '.wav';
 		}
-		if (pokemon.shiny) back += '-shiny';
 		if (window.BattlePokemonSprites && BattlePokemonSprites[pokemon.speciesid] && BattlePokemonSprites[pokemon.speciesid][facing]) {
-			var url = '/sprites/bwani'+back;
-			url += '/'+spriteid;
+			var url = 'http://pokemon-online.eu/images/pokemon/black-white/animated/'+ back + shiny + padd(pokemon.num) + '.gif';
 			var spriteType = 'ani';
 			if (BattlePokemonSprites[pokemon.speciesid][facing]['anif'] && pokemon.gender === 'F') {
-				url += '-f';
-				spriteType = 'anif';
+/*				url += '-f';
+				spriteType = 'anif';*/
 			}
-			url += '.gif';
 			return {
 				w: BattlePokemonSprites[pokemon.speciesid][facing][spriteType].w,
 				h: BattlePokemonSprites[pokemon.speciesid][facing][spriteType].h,
@@ -427,10 +437,11 @@ var Tools = {
 		return {
 			w: 96,
 			h: 96,
-			url: '/sprites/bw'+back+'/' + spriteid + '.png',
+			url: 'http://pokemon-online.eu/images/pokemon/black-white/'+ back + shiny + pokemon.num + '.png',
 			cryurl: cryurl,
 			isBackSprite: isBack
 		};
+        return 'background-image:url(http://pokemon-online.eu/images/pokemon/black-white/'+shiny+pokemon.num+'.png)';
 	},
 
 	getIcon: function(pokemon) {
@@ -449,7 +460,7 @@ var Tools = {
 		else if (BattlePokemonSprites[id] && BattlePokemonSprites[id].num) num = BattlePokemonSprites[id].num;
 		else if (exports.BattlePokedex[id] && exports.BattlePokedex[id].num) num = exports.BattlePokedex[id].num;
 		if (num < 0) num = 0;
-		var altNums = {
+		/*var altNums = {
 			"rotomfan": 699,
 			"rotomfrost": 700,
 			"rotomheat": 701,
@@ -474,36 +485,20 @@ var Tools = {
 			"landorustherian": 738,
 			"kyuremblack": 739,
 			"kyuremwhite": 740,
-			"keldeoresolution": 741,
-			"syclant": 752+0,
-			"revenankh": 752+1,
-			"pyroak": 752+2,
-			"fidgit": 752+3,
-			"stratagem": 752+4,
-			"arghonaut": 752+5,
-			"kitsunoh": 752+6,
-			"cyclohm": 752+7,
-			"colossoil": 752+8,
-			"krilowatt": 752+9,
-			"voodoom": 752+10,
-			"tomohawk": 752+11,
-			"necturna": 752+12,
-			"mollux": 752+13,
-			"aurumoth": 752+14
+			"keldeoresolution": 741
 		};
 		if (altNums[id]) {
 			num = altNums[id];
 		}
+
 		if (pokemon && pokemon.gender === 'F') {
 			if (id === 'unfezant') num = 708;
 			else if (id === 'frillish') num = 721;
 			else if (id === 'jellicent') num = 722;
-		}
+		}*/
 
-		var top = 8 + Math.floor(num / 16) * 32;
-		var left = (num % 16) * 32;
 		var fainted = (pokemon && pokemon.fainted?';opacity:.4':'');
-		return 'background:transparent url(/sprites/bwicons-sheet.png?v0.7.18) no-repeat scroll -' + left + 'px -' + top + 'px' + fainted;
+		return 'background:transparent url(http://pokemon-online.eu/images/poke_img/' + num + '.png) no-repeat ' + fainted;
 	},
 
 	getTeambuilderSprite: function(pokemon) {
@@ -518,11 +513,11 @@ var Tools = {
 				id = toId(pokemon.species);
 			}
 		}
-		var shiny = (pokemon.shiny?'-shiny':'');
+		var shiny = (pokemon.shiny?'shiny/':'');
 		if (BattlePokemonSprites && BattlePokemonSprites[id] && BattlePokemonSprites[id].front && BattlePokemonSprites[id].front.anif && pokemon.gender === 'F') {
-			id+='-f';
+			//id+='-f';
 		}
-		return 'background-image:url(/sprites/bw'+shiny+'/'+id+'.png)';
+		return 'background-image:url(http://pokemon-online.eu/images/pokemon/black-white/'+shiny+id+'.png)';
 	},
 
 	getItemIcon: function(item) {
@@ -538,5 +533,17 @@ var Tools = {
 	getTypeIcon: function(type, b) { // b is just for utilichart.js
 		sanitizedType = type.replace(/\?/g,'%3f');
 		return '<img src="/sprites/types/'+sanitizedType+'.png" alt="'+type+'" height="14" width="32"'+(b?' class="b"':'')+' />';
-	}
+	},
+
+    getSpecies: function(num) {
+        return exports.BattlePokedex.nums[num];
+    },
+
+    getMoveName: function(num) {
+        return exports.BattleMovedex.nums[num];
+    },
+
+    getStatName : function (num) {
+        return POStatNames.nums[num];
+    }
 };

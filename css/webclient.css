@@ -12,6 +12,11 @@ body {
     font-size: 13px;
 }
 
+/* Activity in the tab (new message etc.) */
+.ui-state-default a.tab-active {
+    color: #2a56fd; /* need a better color */
+}
+
 #colorPicker .farbtastic {
     margin: auto;
 }
@@ -112,6 +117,10 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.player-list-item.player-battling {
+    color: #5d838c;
 }
 
 .player-list-item:hover, .player-list-item.selected {
