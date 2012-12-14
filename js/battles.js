@@ -120,8 +120,8 @@ function BattleTab(pid, conf) {
 
         this.battle.runMajor(["player", "p1", players.name(conf.players[0])]);
         this.battle.runMajor(["player", "p2", players.name(conf.players[1])]);
+        this.battle.runMajor(["gametype", "singles"]);//could use this.conf.mode
 
-        this.battle.runMajor(["start"]);
         this.battle.play();
 //        this.battle.runMajor(["poke", "p1: Pikachu", "Pikachu, 20, M"]);
 //        this.battle.runMajor(["poke", "p2: Gyarados", "Gyarados, 30, F, shiny"]);
@@ -143,7 +143,7 @@ function BattleTab(pid, conf) {
 
 BattleTab.inherits(ChannelTab);
 
-BattleTab.prototype.players = function() {
+BattleTab.prototype.playerIds = function() {
     var array = [];
     for (var i = 0; i < this.conf.players.length; i++) {
         array.push(this.conf.players[i]);
@@ -191,7 +191,7 @@ BattleTab.prototype.dealWithCommand = function(params) {
 BattleTab.prototype.addCommand = function(args, kwargs) {
     kwargs = kwargs||{};
     for (var x in kwargs) {
-        args.push("["+x+"="+kwargs[x]+"]");
+        args.push("["+x+"]"+kwargs[x]);
     }
     this.battle.add("|"+args.join("|"));
 }
@@ -256,6 +256,7 @@ BattleTab.prototype.pokemonDetails = function(pokemon) {
 };
 
 BattleTab.statuses = {
+    "-1": "confusion",
     0: "",
     1: "par",
     2: "slp",
@@ -307,7 +308,7 @@ BattleTab.prototype.dealWithEffectiveness = function(params) {
     }
 };
 
-BattleTab.prototype.dealWithCriticalhit = function(params) {
+BattleTab.prototype.dealWithCritical = function(params) {
     this.addCommand(["-crit", this.spotToPlayer(params.spot)]);
 };
 
@@ -335,6 +336,7 @@ BattleTab.prototype.dealWithStatus = function(params) {
     if (status == "psn" && params.multiple) {
         status = "tox";
     }
+    this.pokes[params.spot].status = params.status;
     this.addCommand(["-status", this.spotToPlayer(params.spot), status]);
 };
 
@@ -348,7 +350,7 @@ BattleTab.prototype.dealWithFail = function(params) {
 };
 
 BattleTab.prototype.dealWithPlayerchat = function(params) {
-    var name = this.conf.ids[params.spot];
+    var name = players.name(this.conf.players[params.spot]);
     this.addCommand(["chat", name, params.message]);
 };
 
@@ -389,4 +391,85 @@ BattleTab.prototype.dealWithRecoil = function(params) {
 
 BattleTab.prototype.dealWithDrain = function(params) {
     this.damageCause.from = "drain";
+    this.damageCause.of = this.spotToPlayer(params.spot);
+};
+
+BattleTab.prototype.dealWithAlreadystatus = function(params) {
+    this.addCommand(["-fail", this.spotToPlayer(params.spot), BattleTab.statuses[params.status]]);
+};
+
+BattleTab.prototype.dealWithFeelstatus = function(params) {
+    this.addCommand(["-cant", this.spotToPlayer(params.spot), BattleTab.statuses[params.status]]);
+};
+
+BattleTab.prototype.dealWithFreestatus = function(params) {
+    this.addCommand(["-curestatus", this.spotToPlayer(params.spot), BattleTab.statuses[params.status]]);
+};
+
+BattleTab.weathers = {
+    0: "none",
+    1: "hail",
+    2: "raindance",
+    3: "sandstorm",
+    4: "sunnyday"
+};
+
+BattleTab.prototype.dealWithWeatherstart = function(params) {
+    var kwargs = {};
+    if (params.permanent) {
+        kwargs.of = this.spotToPlayer(params.spot);
+    }
+    this.addCommand(["-weather", BattleTab.weathers[params.weather]], kwargs);
+};
+
+BattleTab.prototype.dealWithFeelweather = function(params) {
+    this.addCommand(["-weather", BattleTab.weathers[params.weather]], {"upkeep": true});
+};
+
+BattleTab.prototype.dealWithWeatherend = function(params) {
+    this.addCommand(["-weather", "none"]);
+};
+
+BattleTab.prototype.dealWithWeatherhurt = function(params) {
+    this.damageCause.from = BattleTab.weathers[params.weather];
+};
+
+BattleTab.prototype.dealWithSubstitute = function(params) {
+    this.addCommand([params.substitute?"-start":"-end", this.spotToPlayer(params.spot), "Substitute"]);
+};
+
+BattleTab.prototype.dealWithTier = function(params) {
+    this.addCommand(["tier", params.tier]);
+};
+
+BattleTab.clauses = {
+    0: "Sleep Clause",
+    1: "Freeze Clause",
+    2: "Disallow Spects",
+    3: "Item Clause",
+    4: "Challenge Cup",
+    5: "No Timeout",
+    6: "Species Clause",
+    7: "Wifi Battle",
+    8: "Self-KO Clause"
+};
+
+BattleTab.prototype.dealWithRated = function(params) {
+    if (params.rated) {
+        this.addCommand(["rated", params.rated]);
+    }
+
+    /* Print the clauses, convert flags to actual clause numbers */
+    var clauses = this.conf.clauses;
+    var i = 0;
+
+    while (clauses > 0) {
+        if (clauses % 2) {
+            this.addCommand(["rule", BattleTab.clauses[i]]);
+        }
+        clauses = Math.floor(clauses/2);
+        i = i+1;
+    }
+
+    this.addCommand(["start"]);
 };

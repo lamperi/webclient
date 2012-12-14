@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -10,6 +11,46 @@
         <link rel="stylesheet" href="css/chat.css" />
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.min.js"></script>
+        <script type="text/javascript">
+            (function($) {
+                $.fn.extend({
+                    filterFor: function(listSelector) {
+                        var   self = this
+                                , $titles = $(listSelector)
+                        // The list with keys to skip (esc, arrows, return, etc)
+                        // 8 is backspace, you might want to remove that for better usability
+                                , keys = [13, 27, 32, 37, 38, 39, 40 /*,8*/ ]
+                                ;
+
+                        if ($titles.length !== 0) {
+                            if(!$titles.is('ul,ol')){
+                                $titles = $titles.find('ul,ol');
+                            }
+//                                    $titles.each(function(index, node) {
+//                                        cache[index] = $(node);
+//                                    });
+
+                            $(this).keyup(function(e) {
+                                var val = $(self).val().toLowerCase();
+                                if ($.inArray(e.keyCode, keys) === -1) {
+                                    $titles.find('li').each(function() {
+                                        var $node = $(this);
+
+                                        if ($node.html().toLowerCase().indexOf(val) === -1) {
+                                            $node.hide();
+                                        } else {
+                                            $node.show();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+
+                        return this;
+                    }
+                });
+            }(jQuery));
+        </script>
         <script src="libs/farbtastic.js" type="text/javascript"></script>
         <script src="libs/md5.js"></script>
         <script src="libs/utilities.js"></script>
@@ -57,14 +98,10 @@
                     if (/^#channel-/.test(hrefid)) {
                         if (channels.hasChannel(id)) {
                             currentChannel = id;
-                            /* Update player list when switching channels */
-                            channels.channel(currentChannel).generatePlayerList();
                         }
-                    } else if (/^#pm-/.test(hrefid)) {
-                        playerList.setPlayers(pms.pm(id).players());
-                    } else if (/^#battle-/.test(hrefid)) {
-                        playerList.setPlayers(battles.battle(id).players());
                     }
+                    /* Update player list when switching channels */
+                    playerList.setPlayers(currentTabObject.playerIds());
                 });
 
                 $("#channel-tabs").bind('tabsshow', function(event, ui) {
@@ -126,7 +163,7 @@
                         this.target = "_blank";
                     }
                 });
-                $(document).on("keydown", "input[type=text]", function (event) {
+                $(document).on("keydown", "input[history=true]", function (event) {
                     var elem = event.currentTarget,
                         maxHistSize = 100;
                     elem.hist = elem.hist || [];
@@ -249,11 +286,32 @@
 
             <table class="container"><tr style="height: 100%"><td class="sidebar" style="vertical-align: top;">
                 <div class="logo">PO</div>
+                <a href="#" class="find-battle">
+                    Find Battle
+                </a>
+                <ul class="controls-list">
+                    <li>Chat</li>
+                    <li>Team Builder</li>
+                    <li>User Controls</li>
+                </ul>
+                <div class="filter-users">
+                    <span>Users</span><br>
+                    <input name="filter" id="search_filter" type="text" />
+                </div>
                 <p style="display: none">
                     <input type="text" id="join-channel" onkeydown="if(event.keyCode==13)joinChannel();" placeholder="Join channel..."/>
                 </p>
+                <div id="titles">
                     <ul class="player-list" id="player-list">
                     </ul>
+                </div>
+                <script type="text/javascript">
+                    $(function() {
+                        $('#search_filter').filterFor('#player-list', {caseSensitive : false});
+                        /* The Player list also needs to know the filter, when it adds new elements whether to show them or not */
+                        $('#search_filter').keyup(function(){playerList.filter=$(this).val().toLowerCase();});
+                    });
+                </script>
             </td><td class="contents" style="vertical-align: top;">
                 <!--<div id="announcement" class="announcement"></div>-->
                 <div id="channel-tabs">
@@ -263,10 +321,10 @@
                     <div id="channel-0">
                         <div id="chatTextArea" class="textbox"></div>
                         <p>
-                            <input type="text" id="send-channel-0" cols="40" onkeydown="if(event.keyCode==13)sendMessage(this);" placeholder="Type your message here..."/>
+                            <input type="text" id="send-channel-0" cols="40" history="true" onkeydown="if(event.keyCode==13)sendMessage(this);" placeholder="Type your message here..."/>
                             <button onClick="sendMessage(document.getElementById('send-channel-0'));">Send</button>
                             <button id="register" onClick="wannaRegister()">Register</button>
-                            <button onClick="channels.leaveChannel(0);">Leave Channel</button>
+                            <button onClick="channels.leaveChannel(0);" class="leave-chan">Leave Channel</button>
                             <button id="color" name="color" onclick="openColorPicker()">Color</button>
                             <div id="colorDialog" title="Trainer name &amp; color">
                                 Name <input type="text" id="trainer-name" onkeydown="if(event.keyCode==13){event.stopPropagation(); $('#colorDialog').dialog('close');}"/>
@@ -639,6 +697,11 @@
                     var chanid = data.split("|")[0];
                     var batt = JSON.parse(data.slice(chanid.length+1));
                     battles.addBattle(batt);
+
+                    /* Update whole player list */
+                    if (chanid == currentChannel) {
+                        playerList.setPlayers(currentTabObject.playerIds());
+                    }
                 } else if (cmd === "battlefinished") {
                     var battleid = data.split("|")[0];
                     var result = JSON.parse(data.slice(battleid.length+1));
@@ -647,8 +710,7 @@
             };
 
         </script>
-    </body>
-    <script src="libs/alertify.min.js"></script>
+    <script src="libs/alertify.js"></script>
     <!-- there for now as it's dev version. Should be moved in initBattleData when out of dev -->
     <script src="libs/ps/js/battledata.js"></script>
     <script src="libs/ps/data/pokedex-mini.js"></script>
@@ -661,4 +723,5 @@
     <script src="libs/ps/data/abilities.js"></script>
     <script src="libs/ps/data/formats.js"></script>
     <script src="libs/ps/js/utilichart.js"></script>
+    </body>
 </html>

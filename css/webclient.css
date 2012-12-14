@@ -49,22 +49,28 @@ body {
     color: #4c4c4c;
     margin: 20px 10px;
     text-align: right;
+    position: relative;
 }
 
-/*.logo:before {
+.logo:before {
     content: "[BETA]";
-    position: relative;
-}*/
+    position: absolute;
+    right: 65px;
+    top: 8px;
+    color: red;
+    font-size: 11px;
+}
 
 .textbox {
-    font: 13px Tahoma,Calibri,Verdana,Geneva,sans-serif !important;
+    /*font: 13px Tahoma,Calibri,Verdana,Geneva,sans-serif !important;*/
     background: none repeat scroll 0% 0% rgb(255, 255, 255);
-    border: 1px solid rgb(107, 145, 171);
+    border: 0 !important;
     padding: 4px 5px;
     margin-bottom: 4px;
     outline: 0px none;
     overflow: auto;
     border-radius: 2px;
+    line-height: 18px;
 }
 
 #channel-tabs {
@@ -103,10 +109,16 @@ body {
     overflow: auto;
 }
 
-.player-list-item {
-    font-size: 13px;
+.controls-list {
+    margin-top: 20px;
+    border-bottom: 1px solid #222222;
+}
+
+.player-list-item, .controls-list li {
+    font-size: 15px;
     color: #616161;
-    line-height: 2;
+    height: 40px;
+    line-height: 40px;
     padding-left: 18px;
     cursor: pointer;
 
@@ -123,8 +135,12 @@ body {
     color: #5d838c;
 }
 
-.player-list-item:hover, .player-list-item.selected {
+.player-list-item:hover, .player-list-item.selected, .controls-list li:hover {
     background-color: #252525;
+}
+
+.controls-list li:hover {
+    color: #FFF;
 }
 
 /* Moves the client part into the centre:
@@ -135,4 +151,66 @@ body {
 /* Fix auto complete results being too big */
 li[role="presentation"] {
     font-size: 11px;
+}
+
+.sidebar ::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+.sidebar ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+.sidebar ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    background: #111;
+}
+
+.find-battle {
+    margin: 20px 0 0 35px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: #1087da;
+    color: #FFF;
+    font-size: 16px;
+    border-radius: 2px;
+    padding: 10px 15px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.filter-users {
+    padding-left: 18px;
+    margin: 15px 0;
+}
+
+.filter-users span {
+    text-transform: uppercase;
+    color: #3b3a3a;
+    font-size: 12px;
+}
+
+.filter-users input {
+    background: #111111 url(../images/posearch.png) no-repeat center right;
+    border: 0;
+    border-radius: 2px;
+    color: #252525;
+    margin-top: 10px;
+    padding: 10px;
+    width: 130px;
+    font-size: 16px;
+}
+
+/******************/
+/** Not in the other css
+ so at least PO knows the
+ correct size before laoding
+ the battle css **/
+/******************/
+.battlewrapper
+{
+    height: 400px;
+    position: relative;
 }
