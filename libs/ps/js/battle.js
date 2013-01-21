@@ -2325,6 +2325,7 @@ function Battle(frame, logFrame, noPreload) {
 		}
 	};
 	this.runMinor = function (args, kwargs) {
+        console.log("arguments: " + JSON.stringify(args) + ", " + JSON.stringify(kwargs));
 		var actions = '';
 		var hiddenactions = '';
 		var minors = self.minorQueue;
@@ -2923,6 +2924,7 @@ function Battle(frame, logFrame, noPreload) {
 					self.resultAnim(poke, item.name, 'neutral', animDelay);
 					break;
 				case 'thief':
+                case 'pickpocket':
 				case 'covet':
 					actions += '' + poke.getName() + ' stole ' + ofpoke.getLowerName() + "'s item!";
 					self.resultAnim(poke, item.name, 'neutral', animDelay);
@@ -4004,7 +4006,7 @@ function Battle(frame, logFrame, noPreload) {
 		}
 	};
 	this.runMajor = function(args, kwargs, preempt) {
-        console.log("arguments: " + JSON.stringify(args));
+        console.log("arguments: " + JSON.stringify(args) + ", " + JSON.stringify(kwargs));
 		switch (args[0]) {
 		case 'start':
 			self.teamPreview(false);
@@ -4211,13 +4213,13 @@ function Battle(frame, logFrame, noPreload) {
 				} else {
 					self.runMajor(args, kwargs, preempt);
 				}
-			} else try {
+			} else /*try*/ {
 				if (args[0].substr(0,1) === '-') {
 					self.runMinor(args, kwargs);
 				} else {
 					self.runMajor(args, kwargs, preempt);
 				}
-			} catch (e) {
+			} /*catch (e) {
 				self.log('<div class="chat">Error parsing: ' + self.sanitize(str) + '</div>', preempt);
 				if (e.stack) {
 					var stack = ''+e.stack;
@@ -4226,7 +4228,7 @@ function Battle(frame, logFrame, noPreload) {
 				} else {
 					self.log('<div class="chat">Error: ' + e + '</div>', preempt);
 				}
-			}
+			}*/
 		} else {
 			self.log('<div class="chat">' + self.sanitize(str) + '</div>', preempt);
 		}

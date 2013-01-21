@@ -1,6 +1,9 @@
 function Channels() {
     this.channels = {"0": new Channel(0, "Main channel")};
     this.names = {};
+
+    currentTabObject = this.channels[0];
+    currentChannel = 0;
 }
 
 Channels.prototype.channel = function (id) {
@@ -10,20 +13,20 @@ Channels.prototype.channel = function (id) {
 
     if (!(id in this.channels)) {
         this.channels[id] = new Channel(id, this.names[id]);
-    }
 
-    /* Hack to detect when the first channel is opened */
-    if (Object.keys(this.channels).length === 1) {
-        currentTabObject = this.channels[id];
-        currentChannel = id;
+        /* Hack to detect when the first channel is opened */
+        if (Object.keys(this.channels).length === 1) {
+            currentTabObject = this.channels[id];
+            currentChannel = id;
+        }
     }
 
     return this.channels[id];
-}
+};
 
 Channels.prototype.hasChannel = function(id) {
     return id in this.channels;
-}
+};
 
 Channels.prototype.setNames = function (names) {
     this.names = names;
@@ -34,18 +37,18 @@ Channels.prototype.setNames = function (names) {
             this.channel(i).changeName(names[i]);
         }
     }
-}
+};
 
 Channels.prototype.changeChannelName = function (id, name) {
     this.names[id] = name;
     if (id in this.channels) {
         this.channels[id].changeName(name);
     }
-}
+};
 
 Channels.prototype.newChannel = function (id, name) {
     this.names[id] = name;
-}
+};
 
 Channels.prototype.leaveChannel = function(chanid) {
     if (!this.hasChannel(chanid) || this.channel(chanid).closable & 1) {
@@ -54,7 +57,7 @@ Channels.prototype.leaveChannel = function(chanid) {
         this.channel(chanid).closable |= 2;
         websocket.send("leave|"+chanid);
     }
-}
+};
 
 Channels.prototype.removeChannel = function (id) {
     if (id in this.channels) {
@@ -68,17 +71,17 @@ Channels.prototype.removeChannel = function (id) {
     }
 
     delete this.names[id];
-}
+};
 
 Channels.prototype.current = function () {
     return this.channel(this.currentId());
-}
+};
 
 Channels.prototype.currentId = function() {
 //    var index = $("#channel-tabs").tabs("option", "active");
 //    return this.idFromIndex(index);
     return currentChannel;
-}
+};
 
 Channels.prototype.idFromIndex = function (index) {
     var queryIndex = index + 1;
@@ -88,7 +91,7 @@ Channels.prototype.idFromIndex = function (index) {
         return -1;
     }
     return hrefid.substr(hrefid.indexOf("-") + 1);
-}
+};
 
 Channels.prototype.channelsByName = function () {
     var that = this;
@@ -96,7 +99,7 @@ Channels.prototype.channelsByName = function () {
     return Object.keys(this.names).map(function (value, index, array) {
         return that.names[value];
     })
-}
+};
 
 function Channel(id, name) {
     this.shortHand = "channel";
@@ -134,7 +137,7 @@ Channel.prototype.setPlayers = function(players) {
     if (channels.currentId() == this.id) {
         this.generatePlayerList();
     }
-}
+};
 
 Channel.prototype.newPlayer = function(player) {
     this.players[player] = true;
@@ -142,7 +145,7 @@ Channel.prototype.newPlayer = function(player) {
     if (this.isCurrent()) {
         playerList.addPlayer(player);
     }
-}
+};
 
 Channel.prototype.removePlayer = function(player) {
     delete this.players[player];
@@ -159,15 +162,15 @@ Channel.prototype.removePlayer = function(player) {
             this.print("<i>You were removed from this channel</i>", true)
         }
     }
-}
+};
 
 Channel.prototype.hasPlayer = function(player) {
     return player in this.players;
-}
+};
 
 Channel.prototype.chat = function () {
     return $("#channel-" + this.id + " #chatTextArea");
-}
+};
 
 Channel.prototype.print = function (msg, html, noParse) {
     var chatTextArea = this.chat().get(0);
@@ -216,30 +219,30 @@ Channel.prototype.print = function (msg, html, noParse) {
     if (scrollDown) {
         chatTextArea.scrollTop = chatTextArea.scrollHeight;
     }
-}
+};
 
 Channel.prototype.changeName = function (name) {
     this.name = name;
     $("#channel-tabs > ul a[href=\"#channel-" + this.id + "\"]").html(name);
-}
+};
 
 Channel.prototype.disconnect = function() {
     var pl = this.players;
     this.players = {};
     for(var id in pl) {players.testPlayerOnline(id)};
-}
+};
 
 Channel.prototype.close = function () {
     $('#channel-tabs').tabs("remove", "#channel-" + this.id);
 
     this.disconnect();
     delete channels.channels[this.id];
-}
+};
 
 Channel.prototype.playerIds = function() {
     return Object.keys(this.players);
-}
+};
 
 Channel.prototype.generatePlayerList = function() {
     playerList.setPlayers(this.playerIds());
-}
+};

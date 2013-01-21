@@ -411,8 +411,17 @@ var Tools = {
 		var isBack = !siden;
 		var back = (siden?'':'back/');
         var shiny = pokemon.shiny ? "shiny/" : "";
-		var facing = (siden?'front':'back');
+        var facing = (siden?'front':'back');
+        var female = (pokemon.speciesid in BattlePokemonSprites) && BattlePokemonSprites[pokemon.speciesid][facing]['anif'] && pokemon.gender === 'F' ? "female/":"";
 		var cryurl = '';
+        /*** PO change ***/
+        var forme = '';
+        if (pokemon.forme && pokemon.num in exports.BattlePokedex.nums.formes) {
+            var index = exports.BattlePokedex.nums.formes[pokemon.num].split(" ").indexOf(pokemon.forme.toLowerCase());
+            if (index != 0 && index != -1) {
+                forme = "-"+index;
+            }
+        }
 		var spriteid = pokemon.spriteid;
         /*** PO change ***/
         if (sub) {
@@ -425,12 +434,9 @@ var Tools = {
 			cryurl = '/audio/cries/' + num + '.wav';
 		}
 		if (window.BattlePokemonSprites && BattlePokemonSprites[pokemon.speciesid] && BattlePokemonSprites[pokemon.speciesid][facing]) {
-			var url = 'http://pokemon-online.eu/images/pokemon/black-white/animated/'+ back + shiny + padd(pokemon.num) + '.gif';
+			var url = 'http://pokemon-online.eu/images/pokemon/black-white/animated/'+ back + shiny + female + padd(pokemon.num) + forme + '.gif';
 			var spriteType = 'ani';
-			if (BattlePokemonSprites[pokemon.speciesid][facing]['anif'] && pokemon.gender === 'F') {
-/*				url += '-f';
-				spriteType = 'anif';*/
-			}
+
 			return {
 				w: BattlePokemonSprites[pokemon.speciesid][facing][spriteType].w,
 				h: BattlePokemonSprites[pokemon.speciesid][facing][spriteType].h,
@@ -443,21 +449,21 @@ var Tools = {
 		return {
 			w: 96,
 			h: 96,
-			url: 'http://pokemon-online.eu/images/pokemon/black-white/'+ back + shiny + pokemon.num + '.png',
+			url: 'http://pokemon-online.eu/images/pokemon/black-white/'+ back + shiny + pokemon.num + forme + '.png',
 			cryurl: cryurl,
 			isBackSprite: isBack
 		};
-        return 'background-image:url(http://pokemon-online.eu/images/pokemon/black-white/'+shiny+pokemon.num+'.png)';
+        return 'background-image:url(http://pokemon-online.eu/images/pokemon/black-white/'+shiny+pokemon.num + forme +'.png)';
 	},
 
 	getIcon: function(pokemon) {
 		var num = 0;
 		if (pokemon === 'pokeball') {
-			return 'background:transparent url(/sprites/bwicons-pokeball-sheet.png) no-repeat scroll -0px -8px';
+			return 'background:transparent url(libs/ps/sprites/bwicons-pokeball-sheet.png) no-repeat scroll -0px -0px';
 		} else if (pokemon === 'pokeball-statused') {
-			return 'background:transparent url(/sprites/bwicons-pokeball-sheet.png) no-repeat scroll -32px -8px';
+			return 'background:transparent url(libs/ps/sprites/bwicons-pokeball-sheet.png) no-repeat scroll -32px -0px';
 		} else if (pokemon === 'pokeball-none') {
-			return 'background:transparent url(/sprites/bwicons-pokeball-sheet.png) no-repeat scroll -64px -8px';
+			return 'background:transparent url(libs/ps/sprites/bwicons-pokeball-sheet.png) no-repeat scroll -64px -0px';
 		}
 		var id = toId(pokemon);
 		if (pokemon && pokemon.species) id = toId(pokemon.species);
@@ -533,16 +539,23 @@ var Tools = {
 
 		var top = Math.floor(num / 16) * 24;
 		var left = (num % 16) * 24;
-		return 'background:transparent url(/sprites/itemicons-sheet.png) no-repeat scroll -' + left + 'px -' + top + 'px';
+		return 'background:transparent url(libs/ps/sprites/itemicons-sheet.png) no-repeat scroll -' + left + 'px -' + top + 'px';
 	},
 
 	getTypeIcon: function(type, b) { // b is just for utilichart.js
 		sanitizedType = type.replace(/\?/g,'%3f');
-		return '<img src="/sprites/types/'+sanitizedType+'.png" alt="'+type+'" height="14" width="32"'+(b?' class="b"':'')+' />';
+		return '<img src="libs/ps/sprites/types/'+sanitizedType+'.png" alt="'+type+'" height="14" width="32"'+(b?' class="b"':'')+' />';
 	},
 
-    getSpecies: function(num) {
-        return exports.BattlePokedex.nums[num];
+    getSpecies: function(num, forme) {
+        var res = exports.BattlePokedex.nums[num];
+        if (forme && (num in exports.BattlePokedex.nums.formes)) {
+            var formes = exports.BattlePokedex.nums.formes[num].split(" ");
+            if (forme < formes.length) {
+                res += "-"+formes[forme].tu();
+            }
+        }
+        return res;
     },
 
     getMoveName: function(num) {
@@ -551,5 +564,38 @@ var Tools = {
 
     getStatName : function (num) {
         return POStatNames.nums[num];
+    },
+
+    getItemName : function(num) {
+        return exports.BattleItems.nums[num];
+    },
+
+    getTypeName : function(num) {
+        /* inefficient but w/e */
+        var types = [
+            "Normal",
+            "Fighting",
+            "Flying",
+            "Poison",
+            "Ground",
+            "Rock",
+            "Bug",
+            "Ghost",
+            "Steel",
+            "Fire",
+            "Water",
+            "Grass",
+            "Electric",
+            "Psychic",
+            "Ice",
+            "Dragon",
+            "Dark",
+            "???"
+        ];
+        return types[num];
+    },
+
+    getAbilityName : function(num) {
+        return exports.BattleAbilities.nums[num]
     }
 };

@@ -49,6 +49,20 @@ defineOn(String.prototype, {
     },
     splice: function (pos1, n, replace) {
         return this.slice(0, pos1) + replace + this.slice(pos1+n);
+    },
+    /* Converts xx-yy-zz into Xx-Yy-Zz */
+    tu: function() {
+        var s = this;
+        var prevLetter=false;
+        for (var i=0; i < s.length; i++) {
+            if (/[a-zA-Z]/.test(s[i])) {
+                if (!prevLetter){s[i] = s[i].toUpperCase()}
+                prevLetter = true;
+            } else {
+                prevLetter = false;
+            }
+        }
+        return s;
     }
 });
 
@@ -60,7 +74,8 @@ function convertPOLinks(element) {
 
         switch (proto) {
             case "pokemon":
-                var poke = query.split("&")[0] || "1",
+                query = "?" + query;
+                var poke = getQueryString("num", query.slice(1).split("&")[0], query) || "1",
                     gen = getQueryString("gen", "5", query),
                     shiny = getQueryString("shiny", "false", query) === "true",
                     gender = getQueryString("gender", "male", query),
