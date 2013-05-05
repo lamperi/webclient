@@ -136,6 +136,14 @@ Players.prototype.color = function (id) {
     return color;
 };
 
+Players.prototype.auth = function(id) {
+    var player = this.player(id);
+    if (!player) {
+        return 0;
+    }
+    return player.auth;
+};
+
 /* Fast index search in a sorted array */
 Array.prototype.dichotomy = function(func) {
     if (this.length === 0) return 0;

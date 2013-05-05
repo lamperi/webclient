@@ -91,7 +91,7 @@ PM.prototype.print = function(pid, msg) {
         this.activateTab();
     }
 
-    chatTextArea.innerHTML += msg + "<br/>\n";
+    chatTextArea.innerHTML += format_timestr() + msg + "<br/>\n";
 
     /* Limit number of lines */
     if (this.chatCount++ % 500 === 0) {

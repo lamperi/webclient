@@ -98,7 +98,7 @@ Channels.prototype.channelsByName = function () {
 
     return Object.keys(this.names).map(function (value, index, array) {
         return that.names[value];
-    })
+    });
 };
 
 function Channel(id, name) {
@@ -159,7 +159,7 @@ Channel.prototype.removePlayer = function(player) {
             this.close();
         } else {
             this.closable |= 1;
-            this.print("<i>You were removed from this channel</i>", true)
+            this.print("<i>You were removed from this channel</i>", true);
         }
     }
 };
@@ -201,7 +201,8 @@ Channel.prototype.print = function (msg, html, noParse) {
                 } else if (id === -1) {
                     pref = "<span class='script-message'>" + pref + ":</span>";
                 } else {
-                    pref = "<span class='player-message' style='color: " + players.color(id) + "'>" + pref + ":</span>";
+                    var symb = {1:'@', 2:'%', 3:'~'}[players.auth(id)] || '';
+                    pref = "<span class='player-message' style='color: " + players.color(id) + "'>" + symb + pref + ":</span>";
                     this.activateTab();
                 }
 
@@ -210,7 +211,8 @@ Channel.prototype.print = function (msg, html, noParse) {
         }
     }
 
-    chatTextArea.innerHTML += msg + "<br/>\n";
+
+    chatTextArea.innerHTML += format_timestr() + msg + "<br/>\n";
 
     /* Limit number of lines */
     if (this.chatCount++ % 500 === 0) {

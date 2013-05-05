@@ -10,7 +10,7 @@ defineOn = function (core, props) {
     var x,
         hasDefineProperty = true;
 
-    if ($.browser.msie) {
+    if ($.browser && $.browser.msie) {
         if (parseInt($.browser.version, 10) < 9) {
             hasDefineProperty = false;
         }
@@ -123,6 +123,11 @@ function pokemonPictureUrl(pokeid, gen, gender, shiny, back) {
 
     console.log("Pokémon Image URL: " + BASE + file);
     return BASE + file;
+}
+
+function format_timestr() {
+    var now = new Date(), t;
+    return "<span class='timestamp'>[" + ((t=now.getHours())<10?'0'+t:t) + ":" + ((t=now.getMinutes())<10?'0'+t:t) + "]</span> ";
 }
 
 /* Alias */
